@@ -1,0 +1,11 @@
+project_info.md
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# Old files
+trimmed_dockerfile
+trimmed_requirements.txt
+src/old_pipeline.py
+
