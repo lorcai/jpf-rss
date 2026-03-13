@@ -177,6 +177,47 @@ This is intentionally conservative and safe to execute periodically (e.g., weekl
 
 ---
 
+# Section behavior: calendar, timeline, and search
+
+The Fundación Japón section pages expose event information through two
+different UI mechanisms that do not behave the same:
+
+## Calendar widget (`eventData`)
+
+The calendar dots are populated from a JavaScript array (`eventData`).
+In practice, this data can be partial:
+
+* it mainly marks events by start date for the selected month
+* it may omit ongoing events that started in previous months
+* in some views it can even be empty while timeline entries are still present
+
+For this reason, relying only on calendar data is not sufficient for
+building a complete feed.
+
+## Timeline list (`ul.timeline`)
+
+The rendered timeline is the most complete monthly listing shown to users.
+It typically includes:
+
+* entries in the selected month
+* ongoing events that started in previous months
+
+The scraper therefore uses listing pages and extracts event URLs from
+timeline-like listings instead of relying only on calendar dots.
+
+## Search-by-date pages (`/buscar/<MM>/<YYYY>/<DD>`)
+
+Section URLs such as:
+
+```
+/es/Actividades/<section>/buscar/04/2026/01
+```
+
+show a month-oriented listing and can reveal events not visible in the
+default section view. This is why some events may appear on the general /Actividades/ page but not show on the default corresponding section page. The `/buscar` (e.g https://md.jpf.go.jp/es/Actividades/Arte-y-Cultura/buscar/04/2026/01; to search April) pages can useful when trying to avoid missing upcoming events for the next month.
+
+---
+
 # TO DO
 
 The current implementation works but several improvements are planned.

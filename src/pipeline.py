@@ -104,11 +104,16 @@ def extract_event_links(section_url):
 
     links = set()
 
-    for a in soup.find_all("a", href=True):
-        href = a["href"]
+    # Only collect links from the rendered timeline list.
+    # This avoids non-event /evento/ links that appear in static info blocks.
+    timeline_links = soup.select("ul.timeline h3.timeline-title a[href]")
 
-        if "/evento/" in href:
-            url = urljoin(BASE, href)
+    for a in timeline_links:
+        href = a["href"]
+        url = urljoin(BASE, href)
+
+        # Keep only Spanish activity event URLs with an event id.
+        if re.search(r"^https://md\.jpf\.go\.jp/es/Actividades/.*/evento/\d+/", url):
             links.add(url)
 
     return links
