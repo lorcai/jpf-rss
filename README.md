@@ -48,7 +48,7 @@ Each section page contains links to individual event pages of the form:
 Example:
 
 ```
-/es/Actividades/Arte-y-Cultura/evento/5/<slug>
+/es/Actividades/Arte-y-Cultura/evento/529/jff-theater-peliculas-de-marzo-2026
 ```
 
 The script performs the following steps:
@@ -80,7 +80,7 @@ This allows inspection of the scraped pages and simplifies debugging if the webs
 ├── src/
 │   └── pipeline.py        # main scraping and RSS generation script
 │
-├── data/                  # cached HTML pages downloaded from the site
+├── data/                  # (In gitignore, only debug) cached HTML pages downloaded from the site
 │
 ├── docs/
 │   └── events.xml         # generated RSS feed
@@ -183,12 +183,12 @@ The current implementation works but several improvements are planned.
 
 ## Scraping improvements
 
-* [ ] Reduce the number of HTTP requests by avoiding unnecessary event page downloads
-* [ ] Improve event filtering to avoid non-event pages
+* [ ] Improve event filtering to avoid non-event pages (e.g avoid https://md.jpf.go.jp/es/Actividades/Biblioteca/evento/81/servicio-de-prestamo and https://md.jpf.go.jp/es/Actividades/Biblioteca/evento/11/catalogos or ignore /Biblioteca/ altogether. But also https://md.jpf.go.jp/jp/Actividades/Lengua-Japonesa/evento/132/profesores-de-japones or https://md.jpf.go.jp/es/Actividades/Lengua-Japonesa/evento/161/cursos-marugoto-basico-a-intermedio-para-acceder-mediante-prueba-de-nivel and https://md.jpf.go.jp/es/Actividades/Lengua-Japonesa/evento/130/preguntas-frecuentes-sobre-el-curso-marugoto.) -> Maybe avoid, second order references to "events"
+
+URL shape /evento/... is used for both “real event timeline items” and some “informational pages,” and the current collector does not distinguish context (timeline vs static content area).
+
 * [ ] Extract event **date and time** if present
-* [ ] Extract event **location**
-* [ ] Improve **description extraction** (currently minimal)
-* [ ] Detect and remove **duplicate events**
+* [ ] Improve **description extraction** (currently minimal, get better html?)
 
 ## Feed improvements
 
@@ -204,9 +204,9 @@ The current implementation works but several improvements are planned.
 
 ## Automation
 
-* [ ] Run automatically using **GitHub Actions**
-* [ ] Publish RSS feed automatically to **GitHub Pages**
-* [ ] Schedule weekly refresh
+* [x] Run automatically using **GitHub Actions**
+* [x] Publish RSS feed automatically to **GitHub Pages**
+* [x] Schedule weekly refresh
 
 ---
 
