@@ -150,7 +150,7 @@ You can validate it using:
 Example:
 
 ```
-cd jpf_rss
+cd jpf-rss
 echo "file://$(pwd)/docs/events.xml" >>  ~/.newsboat/urls
 newsboat
 ```
@@ -224,7 +224,7 @@ The current implementation works but several improvements are planned.
 
 ## Scraping improvements
 
-* [ ] Improve event filtering to avoid non-event pages (e.g avoid https://md.jpf.go.jp/es/Actividades/Biblioteca/evento/81/servicio-de-prestamo and https://md.jpf.go.jp/es/Actividades/Biblioteca/evento/11/catalogos or ignore /Biblioteca/ altogether. But also https://md.jpf.go.jp/jp/Actividades/Lengua-Japonesa/evento/132/profesores-de-japones or https://md.jpf.go.jp/es/Actividades/Lengua-Japonesa/evento/161/cursos-marugoto-basico-a-intermedio-para-acceder-mediante-prueba-de-nivel and https://md.jpf.go.jp/es/Actividades/Lengua-Japonesa/evento/130/preguntas-frecuentes-sobre-el-curso-marugoto.) -> Maybe avoid, second order references to "events"
+* [x] Improve event filtering to avoid non-event pages (e.g avoid https://md.jpf.go.jp/es/Actividades/Biblioteca/evento/81/servicio-de-prestamo and https://md.jpf.go.jp/es/Actividades/Biblioteca/evento/11/catalogos or ignore /Biblioteca/ altogether. But also https://md.jpf.go.jp/jp/Actividades/Lengua-Japonesa/evento/132/profesores-de-japones or https://md.jpf.go.jp/es/Actividades/Lengua-Japonesa/evento/161/cursos-marugoto-basico-a-intermedio-para-acceder-mediante-prueba-de-nivel and https://md.jpf.go.jp/es/Actividades/Lengua-Japonesa/evento/130/preguntas-frecuentes-sobre-el-curso-marugoto.) -> Maybe avoid, second order references to "events"
 
 URL shape /evento/... is used for both “real event timeline items” and some “informational pages,” and the current collector does not distinguish context (timeline vs static content area).
 
@@ -248,6 +248,7 @@ URL shape /evento/... is used for both “real event timeline items” and some 
 * [x] Run automatically using **GitHub Actions**
 * [x] Publish RSS feed automatically to **GitHub Pages**
 * [x] Schedule weekly refresh
+* [ ] Generate an html for pretty printing the content of `events.xml` into and `index.html` for the github pages
 
 ---
 
