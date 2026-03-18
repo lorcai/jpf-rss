@@ -19,6 +19,12 @@ The resulting feed is written to:
 docs/events.xml
 ```
 
+and a simple HTML index page is generated at:
+
+```
+docs/index.html
+```
+
 and can be served statically through GitHub Pages.
 
 ---
@@ -248,7 +254,7 @@ URL shape /evento/... is used for both “real event timeline items” and some 
 * [x] Run automatically using **GitHub Actions**
 * [x] Publish RSS feed automatically to **GitHub Pages**
 * [x] Schedule weekly refresh
-* [ ] Generate an html for pretty printing the content of `events.xml` into and `index.html` for the github pages
+* [x] Generate a simple `index.html` from `events.xml` for GitHub Pages
 
 ---
 

@@ -31,6 +31,7 @@ import os
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import xml.etree.ElementTree as ET
+from html import escape
 
 BASE = "https://md.jpf.go.jp"
 
@@ -153,6 +154,8 @@ def parse_event(url):
 def build_rss(events, outfile="docs/events.xml"):
     """Generate RSS XML file."""
 
+    os.makedirs(os.path.dirname(outfile), exist_ok=True)
+
     rss = ET.Element("rss", version="2.0")
     channel = ET.SubElement(rss, "channel")
 
@@ -185,6 +188,52 @@ def build_rss(events, outfile="docs/events.xml"):
     tree.write(outfile, encoding="utf-8", xml_declaration=True)
 
 
+def build_html_from_rss(rss_file="docs/events.xml", outfile="docs/index.html"):
+    """Render a minimal HTML index from the generated RSS file."""
+    tree = ET.parse(rss_file)
+    root = tree.getroot()
+
+    channel = root.find("channel")
+    feed_title = "Eventos Fundación Japón Madrid"
+    feed_description = ""
+    if channel is not None:
+        feed_title = channel.findtext("title") or feed_title
+        feed_description = channel.findtext("description") or ""
+
+    list_items = []
+    for item in root.findall("./channel/item"):
+        title = item.findtext("title") or "Evento"
+        link = item.findtext("link") or "#"
+        list_items.append(
+            f"<li><a href='{escape(link)}' target='_blank' rel='noopener noreferrer'>{escape(title)}</a></li>"
+        )
+
+    events_html = "\n".join(list_items) if list_items else "<li>No hay eventos en el feed.</li>"
+    event_count = len(list_items)
+
+    html = f"""<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{escape(feed_title)}</title>
+</head>
+<body>
+  <h1>{escape(feed_title)}</h1>
+  <p>{escape(feed_description)}</p>
+  <p>Total eventos: {event_count}</p>
+  <p><a href="events.xml">Ver RSS XML</a></p>
+  <ol>
+    {events_html}
+  </ol>
+</body>
+</html>
+"""
+
+    with open(outfile, "w", encoding="utf-8") as f:
+        f.write(html)
+
+
 def main():
 
     print("Collecting event URLs...")
@@ -209,8 +258,10 @@ def main():
             print("error parsing", url, e)
 
     build_rss(events)
+    build_html_from_rss()
 
     print("RSS written to docs/events.xml")
+    print("HTML written to docs/index.html")
 
 
 if __name__ == "__main__":
