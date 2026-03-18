@@ -34,6 +34,8 @@ import xml.etree.ElementTree as ET
 from html import escape
 
 BASE = "https://md.jpf.go.jp"
+FEED_TITLE = "Eventos Fundación Japón Madrid"
+FEED_DESCRIPTION = "Eventos publicados en Fundación Japón Madrid"
 
 SECTIONS = [
     "/es/Actividades/Arte-y-Cultura",
@@ -160,13 +162,13 @@ def build_rss(events, outfile="docs/events.xml"):
     channel = ET.SubElement(rss, "channel")
 
     title = ET.SubElement(channel, "title")
-    title.text = "Eventos Fundación Japón Madrid"
+    title.text = FEED_TITLE
 
     link = ET.SubElement(channel, "link")
     link.text = BASE
 
     description = ET.SubElement(channel, "description")
-    description.text = "Eventos publicados en Fundación Japón Madrid"
+    description.text = FEED_DESCRIPTION
 
     for e in events:
 
@@ -188,22 +190,12 @@ def build_rss(events, outfile="docs/events.xml"):
     tree.write(outfile, encoding="utf-8", xml_declaration=True)
 
 
-def build_html_from_rss(rss_file="docs/events.xml", outfile="docs/index.html"):
-    """Render a minimal HTML index from the generated RSS file."""
-    tree = ET.parse(rss_file)
-    root = tree.getroot()
-
-    channel = root.find("channel")
-    feed_title = "Eventos Fundación Japón Madrid"
-    feed_description = ""
-    if channel is not None:
-        feed_title = channel.findtext("title") or feed_title
-        feed_description = channel.findtext("description") or ""
-
+def build_html(events, outfile="docs/index.html"):
+    """Render a minimal HTML index from scraped events."""
     list_items = []
-    for item in root.findall("./channel/item"):
-        title = item.findtext("title") or "Evento"
-        link = item.findtext("link") or "#"
+    for event in events:
+        title = event.get("title") or "Evento"
+        link = event.get("link") or "#"
         list_items.append(
             f"<li><a href='{escape(link)}' target='_blank' rel='noopener noreferrer'>{escape(title)}</a></li>"
         )
@@ -216,11 +208,11 @@ def build_html_from_rss(rss_file="docs/events.xml", outfile="docs/index.html"):
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{escape(feed_title)}</title>
+  <title>{escape(FEED_TITLE)}</title>
 </head>
 <body>
-  <h1>{escape(feed_title)}</h1>
-  <p>{escape(feed_description)}</p>
+  <h1>{escape(FEED_TITLE)}</h1>
+  <p>{escape(FEED_DESCRIPTION)}</p>
   <p>Total eventos: {event_count}</p>
   <p><a href="events.xml">Ver RSS XML</a></p>
   <ol>
@@ -258,7 +250,7 @@ def main():
             print("error parsing", url, e)
 
     build_rss(events)
-    build_html_from_rss()
+    build_html(events)
 
     print("RSS written to docs/events.xml")
     print("HTML written to docs/index.html")
