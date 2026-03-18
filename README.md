@@ -1,31 +1,68 @@
-# Fundación Japón Madrid – Events RSS
+# Fundación Japón Madrid – RSS feed
 
 ## Purpose
 
-This repository generates an **RSS feed of events published on the website of the Fundación Japón Madrid**.
+I keep missing out on the film series/retrospectives, releases and events. I refuse to use instagram/facebook/twitter and just don't want more mail with the newsletter. I like RSS. No RSS? fine, I'll do it myself.
 
-The official website currently does **not provide an RSS or machine-readable feed** for events. This project retrieves the event pages directly from the site, extracts their metadata, and produces a standard RSS feed that can be consumed by feed readers.
+This repository generates an [**RSS feed of events published on the website of the Fundación Japón Madrid**](https://md.jpf.go.jp/es/Actividades).
 
-Typical use cases include:
+Copy the link to [`events.xml`](https://lorcai.github.io/jpf-rss/events.xml) in the [Feeder app](https://github.com/spacecowboy/Feeder/) or other RSS reader to get notifications for new events.
 
-* following new events in an RSS reader
-* integrating events into personal automation pipelines
-* monitoring updates automatically
-* publishing the feed through GitHub Pages
+The feed is updated automatically every Wednesday at 9:00 AM (Madrid time) using GitHub Actions
 
-The resulting feed is written to:
+## What this repository does
+
+The website does **not provide an RSS or machine-readable feed** for events. This repository retrieves the event pages from the site and produces a standard RSS feed.
+
+The resulting feed is written to: [`docs/events.xml`](https://lorcai.github.io/jpf-rss/events.xml), and a simple HTML index page (for debugging) is generated at: [`docs/index.html`](https://lorcai.github.io/jpf-rss/index.html).
+
+The [Timeline list](#timeline-list-ultimeline) of each "Actividades" section is scraped. This implies that only events starting or ongoing in the current month are included in the feed. Events starting in future months (usually few) may be missed by the feed until the month of the event is reached.
+
+---
+
+# Running the script
+
+## Running with Docker
+
+Build the container:
+
+```
+docker build -t jpf-rss .
+```
+
+Run the script:
+
+```
+docker run --rm \
+  -u $(id -u):$(id -g) \
+  -v $(pwd)/data:/app/data \
+  -v $(pwd)/docs:/app/docs \
+  jpf-rss
+```
+
+This mounts the repository directory so the generated RSS file and downloaded HTML pages are written to the host filesystem.
+
+---
+
+## Local execution
+
+Install dependencies:
+
+```
+pip install -r requirements.txt
+```
+
+Run the scraper:
+
+```
+python src/pipeline.py
+```
+
+The RSS file will be generated at:
 
 ```
 docs/events.xml
 ```
-
-and a simple HTML index page is generated at:
-
-```
-docs/index.html
-```
-
-and can be served statically through GitHub Pages.
 
 ---
 
@@ -37,7 +74,7 @@ The website organizes activities under several sections:
 https://md.jpf.go.jp/es/Actividades/<section>
 ```
 
-Examples include:
+Sections include:
 
 * Arte y Cultura
 * Lengua Japonesa
@@ -76,71 +113,6 @@ data/
 ```
 
 This allows inspection of the scraped pages and simplifies debugging if the website structure changes.
-
----
-
-# Repository structure
-
-```
-.
-├── src/
-│   └── pipeline.py        # main scraping and RSS generation script
-│
-├── data/                  # (In gitignore, only debug) cached HTML pages downloaded from the site
-│
-├── docs/
-│   └── events.xml         # generated RSS feed
-│
-├── requirements.txt
-├── Dockerfile
-└── README.md
-```
-
----
-
-# Running the script
-
-## Local execution
-
-Install dependencies:
-
-```
-pip install -r requirements.txt
-```
-
-Run the scraper:
-
-```
-python src/pipeline.py
-```
-
-The RSS file will be generated at:
-
-```
-docs/events.xml
-```
-
----
-
-## Running with Docker
-
-Build the container:
-
-```
-docker build -t jpf-rss .
-```
-
-Run the script:
-
-```
-docker run --rm \
-  -u $(id -u):$(id -g) \
-  -v $(pwd)/data:/app/data \
-  -v $(pwd)/docs:/app/docs \
-  jpf-rss
-```
-
-This mounts the repository directory so the generated RSS file and downloaded HTML pages are written to the host filesystem.
 
 ---
 
@@ -226,28 +198,21 @@ default section view. This is why some events may appear on the general /Activid
 
 # TO DO
 
-The current implementation works but several improvements are planned.
+Possible improvements:
 
 ## Scraping improvements
 
-* [x] Improve event filtering to avoid non-event pages (e.g avoid https://md.jpf.go.jp/es/Actividades/Biblioteca/evento/81/servicio-de-prestamo and https://md.jpf.go.jp/es/Actividades/Biblioteca/evento/11/catalogos or ignore /Biblioteca/ altogether. But also https://md.jpf.go.jp/jp/Actividades/Lengua-Japonesa/evento/132/profesores-de-japones or https://md.jpf.go.jp/es/Actividades/Lengua-Japonesa/evento/161/cursos-marugoto-basico-a-intermedio-para-acceder-mediante-prueba-de-nivel and https://md.jpf.go.jp/es/Actividades/Lengua-Japonesa/evento/130/preguntas-frecuentes-sobre-el-curso-marugoto.) -> Maybe avoid, second order references to "events"
-
+* [x] Improve event filtering to avoid non-event pages. 
 URL shape /evento/... is used for both “real event timeline items” and some “informational pages,” and the current collector does not distinguish context (timeline vs static content area).
-
-* [ ] Extract event **date and time** if present
-* [ ] Improve **description extraction** (currently minimal, get better html?)
 
 ## Feed improvements
 
 * [ ] Add proper `pubDate` when event dates can be reliably parsed
 * [ ] Add `atom:self` link for better RSS interoperability
-* [ ] Add richer descriptions (HTML content)
 
 ## Reliability
 
 * [ ] Add retry logic for HTTP requests
-* [ ] Detect structural changes in the website
-* [ ] Add logging instead of simple stdout printing
 
 ## Automation
 
